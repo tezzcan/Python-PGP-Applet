@@ -1,7 +1,7 @@
 import gi
 gi.require_version("Gtk", "3.0")
 from gi.repository import Gtk
-import subprocess
+import gnupg 
 
 class WindowMain:
     def __init__(self):
@@ -16,6 +16,9 @@ class WindowMain:
         self.recipentList = self.builder.get_object('combo1')
         self.rec_name = self.builder.get_object('label_recipent_name')
         self.rec_id = self.builder.get_object('label_recipent_id')
+        
+        self.gpg = gnupg.GPG()
+        self.gpg.encoding = 'utf-8'
 
         self.windowMain.show()
     
@@ -54,43 +57,34 @@ class WindowMain:
             dialog.run()
             dialog.destroy()
 
-
-            self.windowRecipent.show()
+            self.encrypt(got_text)
     
     def on_selectRecipentWindow_show(self,widget,data=None):
-        print('SHOW SIGNAL TRIGGER')
+        print(self.toCombo)
+    
+    def on_selectRecipentWindow_destroy(self,widget,data=None):
+        print('DESTROY')
+        #self.windowRecipent.hide()
 
     def on_proceedButton1_clicked(self, widget,data=None):
         print("PROCEED CALL")
         self.windowRecipent.hide()
 
+    def on_cancelButton1_clicked(self, widget,data=None):
+        self.windowRecipent.hide()
         
     def decrypt(self,pgp_data):
-        cmd = f"echo '{pgp_data}' | gpg --decrypt"
-        ps = subprocess.Popen(cmd,shell=True,stdout=subprocess.PIPE,stderr=subprocess.STDOUT)
-        output = ps.communicate()[0].decode("utf-8")
-        self.textbuffer.set_text(output) # setting text to the view
+        self.textbuffer.set_text(str(self.gpg.decrypt(pgp_data))) # setting text to the view
+
+    def encrypt(self,raw_data):
+        public_keys = self.gpg.list_keys()
+        self.toCombo = [{'uid' : "".join(key['uids']),'fingerprint' : key['fingerprint']} for key in public_keys]
+
+        self.windowRecipent.show()
 
 
     def main(self):
         Gtk.main()
-
-
-# class SelectRecipent(Gtk.Dialog):
-#     def __init__(self):
-#         self.builder = Gtk.Builder()
-#         self.builder.add_from_file("gpg.glade")
-#         self.builder.connect_signals(self)
-
-#         self.windowRecipent = self.builder.get_object('selectRecipentWindow')
-#         self.windowRecipent.show()
-
-#     def on_proceedButton1_clicked(self, widget,data=None):
-#         print("PROCEED CALL")
-
-#     def main(self):
-#         Gtk.main()
-
 
 if __name__ == "__main__":
     app = WindowMain()
