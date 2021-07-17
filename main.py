@@ -11,6 +11,7 @@ class WindowMain:
 
         self.windowMain = self.builder.get_object('window')
         self.windowRecipent = self.builder.get_object('selectRecipentWindow')
+        self.about = self.builder.get_object('about_dialog')
 
         self.textView1 = self.builder.get_object('textview1')
         self.recipentList = self.builder.get_object('combo1')
@@ -25,6 +26,9 @@ class WindowMain:
         self.windowMain.show()
     
     def on_window_destroy(self, widget, data=None):
+        Gtk.main_quit()
+    
+    def on_submenu_quit_activate(self, widget,data=None):
         Gtk.main_quit()
     
     def on_button1_clicked(self, widget,data=None):
@@ -99,6 +103,8 @@ class WindowMain:
         self.windowRecipent.show()
         
 
+    def on_about_button_activate(self, widget,data=None):
+        self.about.show()
 
     def main(self):
         Gtk.main()
