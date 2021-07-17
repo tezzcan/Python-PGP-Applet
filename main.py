@@ -14,8 +14,10 @@ class WindowMain:
 
         self.textView1 = self.builder.get_object('textview1')
         self.recipentList = self.builder.get_object('combo1')
-        self.rec_name = self.builder.get_object('label_recipent_name')
+        self.rec_name = self.builder.get_object('label_recipent')
         self.rec_id = self.builder.get_object('label_recipent_id')
+        self.recipentStore = self.builder.get_object('recipentStore')
+
         
         self.gpg = gnupg.GPG()
         self.gpg.encoding = 'utf-8'
@@ -60,11 +62,22 @@ class WindowMain:
             self.encrypt(got_text)
     
     def on_selectRecipentWindow_show(self,widget,data=None):
-        print(self.toCombo)
+        print('SHOW SIGNAL')
     
-    def on_selectRecipentWindow_destroy(self,widget,data=None):
-        print('DESTROY')
-        #self.windowRecipent.hide()
+    def on_combo1_changed(self,widget,data=None):
+        tree_iter = widget.get_active_iter()
+        
+        if tree_iter is not None:
+            model = widget.get_model()
+            selected = model[tree_iter][0]
+        
+        for item in self.toCombo:
+            if item['uid'] == selected:
+                self.rec_id.set_text(item['fingerprint'])
+                self.rec_id.show()
+                self.rec_name.show()
+        
+        
 
     def on_proceedButton1_clicked(self, widget,data=None):
         print("PROCEED CALL")
@@ -80,7 +93,11 @@ class WindowMain:
         public_keys = self.gpg.list_keys()
         self.toCombo = [{'uid' : "".join(key['uids']),'fingerprint' : key['fingerprint']} for key in public_keys]
 
+        for item in self.toCombo:
+            self.recipentStore.append([item['uid']])
+
         self.windowRecipent.show()
+        
 
 
     def main(self):
