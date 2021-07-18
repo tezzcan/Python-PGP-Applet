@@ -22,6 +22,10 @@ class WindowMain:
         
         self.gpg = gnupg.GPG()
         self.gpg.encoding = 'utf-8'
+        public_keys = self.gpg.list_keys()
+        self.toCombo = [{'uid' : "".join(key['uids']),'fingerprint' : key['fingerprint']} for key in public_keys]
+        for item in self.toCombo:
+            self.recipentStore.append([item['uid']])
 
         self.windowMain.show()
     
@@ -32,7 +36,6 @@ class WindowMain:
         Gtk.main_quit()
     
     def on_button1_clicked(self, widget,data=None):
-        print('TEST')
         self.textbuffer = self.textView1.get_buffer() # get buffer for set and get
 
         start_iter = self.textbuffer.get_start_iter() # getting text from the view
@@ -63,10 +66,11 @@ class WindowMain:
             dialog.run()
             dialog.destroy()
 
-            self.encrypt(got_text)
+            self.raw_data = got_text
+            self.windowRecipent.show()
     
     def on_selectRecipentWindow_show(self,widget,data=None):
-        print('SHOW SIGNAL')
+        pass
     
     def on_combo1_changed(self,widget,data=None):
         tree_iter = widget.get_active_iter()
@@ -84,24 +88,16 @@ class WindowMain:
         
 
     def on_proceedButton1_clicked(self, widget,data=None):
-        print("PROCEED CALL")
+        #! ENCRYPTION PART        
+        encrypted_ascii_data = self.gpg.encrypt(self.raw_data, [f'{self.rec_id.get_text()}'],always_trust=True)
+        self.textbuffer.set_text(str(encrypted_ascii_data)) # setting text to the view
         self.windowRecipent.hide()
 
     def on_cancelButton1_clicked(self, widget,data=None):
         self.windowRecipent.hide()
         
     def decrypt(self,pgp_data):
-        self.textbuffer.set_text(str(self.gpg.decrypt(pgp_data))) # setting text to the view
-
-    def encrypt(self,raw_data):
-        public_keys = self.gpg.list_keys()
-        self.toCombo = [{'uid' : "".join(key['uids']),'fingerprint' : key['fingerprint']} for key in public_keys]
-
-        for item in self.toCombo:
-            self.recipentStore.append([item['uid']])
-
-        self.windowRecipent.show()
-        
+        self.textbuffer.set_text(str(self.gpg.decrypt(pgp_data))) # setting text to the view        
 
     def on_about_button_activate(self, widget,data=None):
         self.about.show()

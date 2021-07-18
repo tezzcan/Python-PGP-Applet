@@ -42,3 +42,8 @@ public_keys = gpg.list_keys()
 for key in public_keys:
     print("".join(key['uids']))
     print(key['fingerprint'])
+
+ascii_data = "test deneme"
+recipients = ['9D184AC865E2CD0B40C5B5D2D95479E839D351FD']
+encrypted_ascii_data = gpg.encrypt(ascii_data, recipients)
+print(encrypted_ascii_data)
