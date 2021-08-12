@@ -1,6 +1,8 @@
 import gi
 gi.require_version("Gtk", "3.0")
 from gi.repository import Gtk
+from gi.repository import AppIndicator3 as AppIndicator
+
 import gnupg 
 
 class WindowMain:
@@ -8,6 +10,12 @@ class WindowMain:
         self.builder = Gtk.Builder()
         self.builder.add_from_file("gpg.glade")
         self.builder.connect_signals(self)
+
+        self.indicator = AppIndicator.Indicator.new(
+            "menu-indicator", "calendar-tray", AppIndicator.IndicatorCategory.OTHER
+        )
+        self.indicator.set_status(AppIndicator.IndicatorStatus.ACTIVE)
+
 
         self.windowMain = self.builder.get_object('window')
         self.windowRecipent = self.builder.get_object('selectRecipentWindow')
@@ -19,6 +27,10 @@ class WindowMain:
         self.rec_id = self.builder.get_object('label_recipent_id')
         self.recipentStore = self.builder.get_object('recipentStore')
 
+        self.my_accelerators = Gtk.AccelGroup()
+        self.windowMain.add_accel_group(self.my_accelerators)
+
+
         
         self.gpg = gnupg.GPG()
         self.gpg.encoding = 'utf-8'
@@ -26,14 +38,24 @@ class WindowMain:
         self.toCombo = [{'uid' : "".join(key['uids']),'fingerprint' : key['fingerprint']} for key in public_keys]
         for item in self.toCombo:
             self.recipentStore.append([item['uid']])
+        
+        # key = Keybinder()
+        # key.bind("<control>m", self.test, "SHORTCUT TEST")
+        # key.init()
 
         self.windowMain.show()
     
+    def test(self, widget,data=None):
+        print(data)
+
     def on_window_destroy(self, widget, data=None):
         Gtk.main_quit()
     
     def on_submenu_quit_activate(self, widget,data=None):
         Gtk.main_quit()
+    
+    def on_submenu_list_keys_activate(self, widget, data=None):
+        print('LIST KEYS TRIGGER')
     
     def on_button1_clicked(self, widget,data=None):
         self.textbuffer = self.textView1.get_buffer() # get buffer for set and get

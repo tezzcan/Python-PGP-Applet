@@ -75,6 +75,7 @@
             <property name="width-request">560</property>
             <property name="height-request">510</property>
             <property name="visible">True</property>
+            <property name="sensitive">False</property>
             <property name="can-focus">True</property>
             <property name="wrap-mode">word-char</property>
           </object>
@@ -106,6 +107,7 @@
                         <property name="image">image2</property>
                         <property name="use-stock">False</property>
                         <property name="always-show-image">True</property>
+                        <signal name="activate" handler="on_submenu_list_keys_activate" swapped="no"/>
                       </object>
                     </child>
                     <child>
@@ -146,6 +148,7 @@
                         <property name="can-focus">False</property>
                         <property name="use-underline">True</property>
                         <property name="use-stock">True</property>
+                        <signal name="activate" handler="on_about_button_activate" swapped="no"/>
                       </object>
                     </child>
                   </object>

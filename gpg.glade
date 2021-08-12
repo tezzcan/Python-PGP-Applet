@@ -106,6 +106,7 @@
                         <property name="image">image2</property>
                         <property name="use-stock">False</property>
                         <property name="always-show-image">True</property>
+                        <signal name="activate" handler="on_submenu_list_keys_activate" swapped="no"/>
                       </object>
                     </child>
                     <child>
